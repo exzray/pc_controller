@@ -1,112 +1,82 @@
 package com.akmal.system;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.*;
+import javafx.beans.property.*;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 
-public class ServerService extends Thread {
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-    private static final int SERVER_WAITING_TIMEOUT = 10000;
+public class ServerService extends Service<Void> {
+
+    private static final int SERVER_WAITING_TIMEOUT = 1000;
+
+    private static ServerService instance;
+
+    private final BooleanProperty serverStatus = new SimpleBooleanProperty(false);
+    private final ObjectProperty<Socket> client = new SimpleObjectProperty<>(null);
+    private final StringProperty address = new SimpleStringProperty("");
+    private final IntegerProperty port = new SimpleIntegerProperty(8080);
 
     private ServerSocket server = null;
-    private Socket client = null;
-
-    @Override
-    public void run() {
-        super.run();
 
 
+    public static ServerService getInstance() {
+        if (instance == null)
+            instance = new ServerService();
+
+        return instance;
     }
 
-    private void init() {
-
-        try {
-            InetAddress address = Inet4Address.getByName("192.168.0.133");
-            server = new ServerSocket(6000, 0, address);
-            server.setSoTimeout(SERVER_WAITING_TIMEOUT);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        new Thread(new TaskWaitingClient()).start();
+    public void startServer() {
+        serverStatus.set(true);
+        reset();
+        start();
+        System.out.println("server start");
     }
 
-    public void open() {
-
-    }
-
-    public void close() {
-        // close server socket
-        try {
-            server.close();
-
-            if (client != null)
-                client.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void stopServer() {
+        if (server == null) return;
 
         server = null;
-        client = null;
+        serverStatus.set(false);
+        System.out.println("server stop");
     }
 
-    private class TaskWaitingClient implements Runnable {
+    public BooleanProperty getServerStatus() {
+        return serverStatus;
+    }
 
+    @Override
+    protected Task<Void> createTask() {
+        return new ConnectionTask();
+    }
+
+    private class ConnectionTask extends Task<Void> {
 
         @Override
-        public void run() {
+        protected Void call() throws Exception {
 
-            // start server socket
-            try {
-                System.out.println("waiting client");
-                client = server.accept();
+            // TODO: 10/12/2020 replace hardcoded ip with dynamic ip
+            InetAddress address = InetAddress.getByName("192.168.0.133");
 
-                // connect to client
-                System.out.println(client.getRemoteSocketAddress());
+            if (server == null)
+                server = new ServerSocket(port.get(), 0, address);
+            server.setSoTimeout(SERVER_WAITING_TIMEOUT);
 
-                new Thread(new TaskReadClient()).start();
+            while (serverStatus.get()) {
 
-            } catch (IOException e) {
+                // waiting client
+                Socket client = server.accept();
 
-                if (e instanceof SocketException) {
-                    System.out.println("server close");
-                }
-
-                if (e instanceof SocketTimeoutException) {
-                    System.out.println("server timeout");
-                }
+                if (client == null)
+                    System.out.println("timeout");
 
             }
 
-            System.out.println("thread waiting off");
-
-        }
-
-    }
-
-    private class TaskReadClient implements Runnable {
-
-        @Override
-        public void run() {
-
-            try {
-                final InputStream in = client.getInputStream();
-                final InputStreamReader reader = new InputStreamReader(in);
-                final BufferedReader buffer = new BufferedReader(reader);
-
-                while (server != null) {
-
-                    System.out.println(buffer.readLine());
-
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            return null;
         }
     }
+
 }

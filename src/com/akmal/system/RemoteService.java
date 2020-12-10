@@ -7,23 +7,27 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.image.WritableImage;
 import javafx.scene.robot.Robot;
-import javafx.stage.Screen;
-
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
 
 public class RemoteService extends Service<Void> {
 
     private final BooleanProperty isRunning = new SimpleBooleanProperty(false);
 
+    private static RemoteService instance;
+
     private final DoubleProperty mouseX = new SimpleDoubleProperty();
     private final DoubleProperty mouseY = new SimpleDoubleProperty();
 
+
+    public static RemoteService getInstance() {
+        if (instance == null)
+            instance = new RemoteService();
+
+        return instance;
+    }
+
+    private RemoteService() {
+    }
 
     public void startService() {
         isRunning.set(true);
@@ -32,6 +36,10 @@ public class RemoteService extends Service<Void> {
 
     public void stopService() {
         isRunning.set(false);
+    }
+
+    public BooleanProperty getIsRunning() {
+        return isRunning;
     }
 
     public DoubleProperty getMouseX() {
@@ -53,19 +61,20 @@ public class RemoteService extends Service<Void> {
 
         @Override
         protected Void call() throws Exception {
-            System.out.println("running " + isRunning.get());
+//            final WritableImage roi = new WritableImage(500, 500);
+//            final Rectangle2D rect = Screen.getPrimary().getVisualBounds();
 
             while (isRunning.get()) {
 
                 Platform.runLater(() -> {
                     Robot robot = new Robot();
 
-                    mouseX.set(robot.getMouseX());
-                    mouseY.set(robot.getMouseY());
+                    double x = Math.floor(robot.getMouseX());
+                    double y = Math.floor(robot.getMouseY());
 
-//                    WritableImage roi = new WritableImage(500, 500);
-//                    Rectangle2D rect = Screen.getPrimary().getVisualBounds();
-//
+                    mouseX.set(x);
+                    mouseY.set(y);
+
 //                    WritableImage image = robot.getScreenCapture(roi, rect);
 //
 //                    try {

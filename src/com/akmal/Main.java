@@ -2,7 +2,9 @@ package com.akmal;
 
 import com.akmal.layout.RootController;
 import com.akmal.system.RemoteService;
+import com.akmal.system.ServerService;
 import javafx.application.Application;
+import javafx.concurrent.Service;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -15,6 +17,7 @@ public class Main extends Application {
 
     private static final String WINDOW_TITLE = "PC Controller Server";
 
+    private ServerService server;
     private RemoteService remote;
 
 
@@ -24,7 +27,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        remote = new RemoteService();
+        server = ServerService.getInstance();
+        remote = RemoteService.getInstance();
+
         remote.startService();
 
         FXMLLoader loader = new FXMLLoader(this.getClass().getResource("./layout/root.fxml"));
@@ -32,6 +37,7 @@ public class Main extends Application {
         RootController controller = loader.getController();
         controller.observeMouseX(remote.getMouseX());
         controller.observeMouseY(remote.getMouseY());
+        controller.observeServerRunning(server.getServerStatus());
 
         stage.setOnCloseRequest(this::windowClose);
         stage.setScene(new Scene(parent));
@@ -41,8 +47,8 @@ public class Main extends Application {
 
 
     private void windowClose(WindowEvent event) {
+        server.stopServer();
         remote.stopService();
-        System.out.println("window close");
     }
 
 }

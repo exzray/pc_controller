@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.akmal.layout.RootController">
@@ -42,14 +43,14 @@
             <Insets bottom="20.0" top="10.0" />
         </VBox.margin>
     </Separator>
-   <Label text="SYSTEM INFO">
-      <font>
-         <Font name="System Bold" size="14.0" />
-      </font>
-      <VBox.margin>
-         <Insets bottom="10.0" />
-      </VBox.margin>
-   </Label>
+    <Label text="SYSTEM INFO">
+        <font>
+            <Font name="System Bold" size="14.0" />
+        </font>
+        <VBox.margin>
+            <Insets bottom="10.0" />
+        </VBox.margin>
+    </Label>
     <GridPane>
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="153.0" minWidth="10.0" prefWidth="106.0" />
@@ -100,14 +101,15 @@
     </Separator>
     <GridPane>
         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="454.0" minWidth="10.0" prefWidth="244.0" />
-            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="249.0" minWidth="10.0" prefWidth="236.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="454.0" minWidth="4.0" prefWidth="19.0" />
+         <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="312.0" minWidth="10.0" prefWidth="297.0" />
+            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="249.0" minWidth="10.0" prefWidth="162.0" />
         </columnConstraints>
         <rowConstraints>
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
-        <children>
-            <Button fx:id="button" mnemonicParsing="false" text="START SERVER" GridPane.columnIndex="1" />
-        </children>
+        <Button fx:id="button" mnemonicParsing="false" text="START SERVER" GridPane.columnIndex="2" />
+      <Rectangle fx:id="status" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="10.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="10.0" />
+      <Label fx:id="label_status" textFill="#000000b2" GridPane.columnIndex="1" />
     </GridPane>
 </VBox>
